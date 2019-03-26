@@ -14,10 +14,6 @@ func (r HelloWorld) Get(Id int) (gin.H, int) {
 	return gin.H{"id": Id}, http.StatusOK
 }
 
-func (r HelloWorld) Get(Id string) (gin.H, int) {
-	return gin.H{"id": Id}, http.StatusOK
-}
-
 func main() {
 	router := gin.Default()
 	api := gin_restful.NewApi(router,"/")
