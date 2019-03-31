@@ -1,27 +1,14 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/andrewstuart/goq"
 	"log"
 	"net/http"
 )
 
-var exampleProblems = []ProblemModel {{
-	1,
-	"Title",
-	"Description",
-	"InputDescription",
-	"OutputDescription",
-	[]string{"input-case","output-case"},
-}}
-
-type Testcase struct {
-	Input string `json:"input" goquery:"#sample-input-1"`
-	Output string `json:"output" goquery:"#sample-output-1"`
-}
-
-type Problem struct {
+type ProblemModel struct {
 	Id int `json:"id"`
 	Title string `json:"title" goquery:"#problem_title"`
 	Description string `json:"description" goquery:"#problem_description"`
@@ -30,23 +17,47 @@ type Problem struct {
 	Testcases []string `json:"testcases" goquery:".sampledata"`
 }
 
-type ProblemModel struct {
-	Problem
-	Testcases []Testcase `json:"testcases"`
-}
-
 func (p *ProblemModel) Save() {
-	// TODO: Save to CloudSQL
+	b, err := json.Marshal(p)
+	if err != nil {
+		log.Panic("Error")
+	}
+	connection.Exec("INSERT INTO problems (id, data) VALUES (?)", b)
 }
 
 
 func FindProblemById(id int) *ProblemModel {
-	// TODO: Fetch from CloudSQL or, Parsing and Save
-	parse(1000)
-	return &exampleProblems[0]
+	problem := fetchProblemFromDB(id)
+	if problem == nil {
+		problem := parse(id)
+		problem.Save()
+	}
+	return problem
 }
 
-func parse(id int) {
+func fetchProblemFromDB(id int) *ProblemModel {
+	conn := CreateConnectionFromEnvironmentVariables()
+	pre, err := conn.Prepare("SELECT * FROM problems WHERE id=?")
+	if err != nil {
+		log.Panic("Prepare statement create error")
+	}
+
+	rows, err := pre.Query(id)
+	if err != nil {
+		log.Panic("Prepare statement create error")
+	}
+
+	var problem ProblemModel
+
+	if !rows.Next() {
+		return nil
+	} else {
+		rows.Scan(&problem)
+		return &problem
+	}
+}
+
+func parse(id int) *ProblemModel {
 	res, err := http.Get(fmt.Sprintf("https://acmicpc.net/problem/%d", id))
 	if err != nil {
 		log.Fatal(err)
@@ -59,8 +70,5 @@ func parse(id int) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	var p ProblemModel
-
-	//return problem
+	return &problem
 }
