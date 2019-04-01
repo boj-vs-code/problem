@@ -1,37 +1,51 @@
 package models
 
 import (
-	"database/sql"
+	"cloud.google.com/go/firestore"
+	"context"
 	"fmt"
 	"log"
-	"os"
 )
 
-var connection = CreateConnectionFromEnvironmentVariables()
+var connection Connection
 
 type Connection struct {
-	*sql.DB
+	client *firestore.Client
+	ctx context.Context
 }
 
-func CreateConnectionFromEnvironmentVariables() *Connection {
-	var (
-		connectionName = getEnvOrFanic("CLOUDSQL_CONNECTION_NAME")
-		user           = getEnvOrFanic("CLOUDSQL_USER")
-		password       = os.Getenv("CLOUDSQL_PASSWORD") // NOTE: password may be empty
-	)
-
-	conn, err := sql.Open("mysql", fmt.Sprintf("%s:%s@cloudsql(%s)/", user, password, connectionName))
+func (c *Connection) Initialize() {
+	c.ctx = context.Background()
+	client, err := firestore.NewClient(c.ctx, "boj-vs-code")
 	if err != nil {
-		log.Panic("Error")
+		log.Panic("Couldn't make firestore client")
 	}
-
-	return &Connection{conn}
+	c.client = client
 }
 
-func getEnvOrFanic(k string) string {
-	v := os.Getenv(k)
-	if v == "" {
-		log.Panicf("%s environment variable not set.", k)
+func (c *Connection) Add(collection string, data interface{}) {
+	_, _, err := c.client.Collection(collection).Add(c.ctx, data)
+	if err != nil {
+		log.Panic("Connection#Add Panic")
 	}
-	return v
+}
+
+func (c *Connection) Fetch(collection string, id int) *ProblemModel {
+	doc := c.client.Doc(fmt.Sprintf("%s/%d", collection, id))
+	if doc == nil {
+		return nil
+	} else {
+		docsnap, err := doc.Get(c.ctx)
+		if err != nil {
+			log.Panic("Failed to get document ref")
+		}
+
+		var problem ProblemModel
+		err = docsnap.DataTo(&problem)
+		if err != nil {
+			log.Panic("Failed to convert document ref to ProblemModel")
+		}
+
+		return &problem
+	}
 }
