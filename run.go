@@ -6,5 +6,5 @@ import (
 
 func main() {
 	s := server.CreateServer()
-	s.Run(":7000")
+	s.Run(":8080")
 }

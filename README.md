@@ -6,5 +6,9 @@ It's a api server for boj-vs-code, to get problem data effectively
 
 ## Stack
 
-- GCP(CloudSQL) with Terraform
+- GCP(Firestore, AppEngine) with Terraform
 - Go with [gin-restful](https://github.com/hwangseonu/gin-restful), [goq](https://github.com/andrewstuart/goq)
+
+## CHANGELOG
+
+- 2019-04-01: CloudSQL -> Firestore
