@@ -17,14 +17,13 @@ type ProblemModel struct {
 }
 
 func (p *ProblemModel) Save() {
-	connection.Add("problems", p)
+	connection.Add("problems", p.Id, p)
 }
-
 
 func FindProblemById(id int) *ProblemModel {
 	problem := fetchProblemFromDB(id)
 	if problem == nil {
-		problem := parse(id)
+		problem = parse(id)
 		problem.Save()
 	}
 	return problem
@@ -48,5 +47,8 @@ func parse(id int) *ProblemModel {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	problem.Id = id
+
 	return &problem
 }

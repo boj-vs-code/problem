@@ -4,6 +4,7 @@ import (
 	"cloud.google.com/go/firestore"
 	"context"
 	"fmt"
+	"google.golang.org/api/option"
 	"log"
 )
 
@@ -16,15 +17,17 @@ type Connection struct {
 
 func (c *Connection) Initialize() {
 	c.ctx = context.Background()
-	client, err := firestore.NewClient(c.ctx, "boj-vs-code")
+
+	option := option.WithCredentialsFile("./boj-vs-code-2b2e56865522.json")
+	client, err := firestore.NewClient(c.ctx, "boj-vs-code", option)
 	if err != nil {
 		log.Panic("Couldn't make firestore client")
 	}
 	c.client = client
 }
 
-func (c *Connection) Add(collection string, data interface{}) {
-	_, _, err := c.client.Collection(collection).Add(c.ctx, data)
+func (c *Connection) Add(collection string, id int, data interface{}) {
+	_, err := c.client.Collection(collection).Doc(fmt.Sprintf("%d", id)).Set(c.ctx, data)
 	if err != nil {
 		log.Panic("Connection#Add Panic")
 	}
@@ -32,20 +35,21 @@ func (c *Connection) Add(collection string, data interface{}) {
 
 func (c *Connection) Fetch(collection string, id int) *ProblemModel {
 	doc := c.client.Doc(fmt.Sprintf("%s/%d", collection, id))
+	log.Print(doc)
 	if doc == nil {
 		return nil
-	} else {
-		docsnap, err := doc.Get(c.ctx)
-		if err != nil {
-			log.Panic("Failed to get document ref")
-		}
-
-		var problem ProblemModel
-		err = docsnap.DataTo(&problem)
-		if err != nil {
-			log.Panic("Failed to convert document ref to ProblemModel")
-		}
-
-		return &problem
 	}
+
+	docsnap, err := doc.Get(c.ctx)
+	if err != nil {
+		return nil
+	}
+
+	var problem ProblemModel
+	err = docsnap.DataTo(&problem)
+	if err != nil {
+		log.Panic("Failed to convert document ref to ProblemModel")
+	}
+
+	return &problem
 }
