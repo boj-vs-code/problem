@@ -4,6 +4,7 @@ import (
 	"cloud.google.com/go/firestore"
 	"context"
 	"fmt"
+	"github.com/moreal/boj-vs-code-api-server/problem"
 	"google.golang.org/api/option"
 	"log"
 )
@@ -33,7 +34,7 @@ func (c *Connection) Add(collection string, id int, data interface{}) {
 	}
 }
 
-func (c *Connection) Fetch(collection string, id int) *ProblemModel {
+func (c *Connection) Fetch(collection string, id int) *problem.ProblemModel {
 	doc := c.client.Doc(fmt.Sprintf("%s/%d", collection, id))
 	log.Print(doc)
 	if doc == nil {
@@ -45,7 +46,7 @@ func (c *Connection) Fetch(collection string, id int) *ProblemModel {
 		return nil
 	}
 
-	var problem ProblemModel
+	var problem problem.ProblemModel
 	err = docsnap.DataTo(&problem)
 	if err != nil {
 		log.Panic("Failed to convert document ref to ProblemModel")

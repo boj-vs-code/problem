@@ -4,5 +4,7 @@ handlers:
 - url: /.*
   script: auto
 
+service: problem
+
 env_variables:
   GOOGLE_APPLICATION_CREDENTIALS: boj-vs-code-2b2e56865522.json

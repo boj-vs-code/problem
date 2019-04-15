@@ -1,0 +1,57 @@
+swagger: "2.0"
+info:
+  description: "Endpoints API for boj-vs-code api server"
+  title: "boj-vs-code API"
+  version: "1.0.0"
+host: "boj-vs-code.appspot.com"
+
+produces:
+  - "application/json"
+
+schemes:
+  - "http"
+
+paths:
+  /problem/{id}:
+    get:
+      operationId: "get-problem"
+      produces:
+        - application/json
+      parameters:
+      - name: id
+        in: path
+        description: Problem id
+        required: true
+        type: integer
+          
+      responses:
+        '200':
+          description: Problem information
+          schema:
+            $ref: '#/definitions/Problem'
+                
+
+definitions:
+  Problem:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Problem ID
+      title:
+        type: string
+        description: Problem title
+      description:
+        type: string
+        description: Problem description
+      inputDescription:
+        type: string
+        description: Problem input-description
+      outputDescription:
+        type: string
+        description: Problem output-description
+      testcases:
+        type: array
+        description: Problem's testcases
+        items:
+          type: string

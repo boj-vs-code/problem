@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"github.com/andrewstuart/goq"
+	"github.com/moreal/boj-vs-code-api-server/problem"
 	"log"
 	"net/http"
 )
@@ -17,7 +18,7 @@ type ProblemModel struct {
 }
 
 func (p *ProblemModel) Save() {
-	connection.Add("problems", p.Id, p)
+	problem.connection.Add("problems", p.Id, p)
 }
 
 func FindProblemById(id int) *ProblemModel {
@@ -30,8 +31,8 @@ func FindProblemById(id int) *ProblemModel {
 }
 
 func fetchProblemFromDB(id int) *ProblemModel {
-	connection.Initialize()
-	return connection.Fetch("problems", id)
+	problem.connection.Initialize()
+	return problem.connection.Fetch("problems", id)
 }
 
 func parse(id int) *ProblemModel {
