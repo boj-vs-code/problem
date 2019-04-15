@@ -3,7 +3,6 @@ package models
 import (
 	"fmt"
 	"github.com/andrewstuart/goq"
-	"github.com/moreal/boj-vs-code-api-server/problem"
 	"log"
 	"net/http"
 )
@@ -11,14 +10,14 @@ import (
 type ProblemModel struct {
 	Id int `json:"id"`
 	Title string `json:"title" goquery:"#problem_title" firestore:"title"`
-	Description string `json:"description" goquery:"#problem_description" firestore:"description"`
+	Description string `json:"description" goquery:"#problem_description,html" firestore:"description"`
 	InputDescription string `json:"inputDescription" goquery:"#problem_input" firestore:"input_description"`
 	OutputDescription string `json:"outputDescription" goquery:"#problem_output" firestore:"output_description"`
 	Testcases []string `json:"testcases" goquery:".sampledata" firestore:"testcases"`
 }
 
 func (p *ProblemModel) Save() {
-	problem.connection.Add("problems", p.Id, p)
+	connection.Add("problems", p.Id, p)
 }
 
 func FindProblemById(id int) *ProblemModel {
@@ -31,8 +30,8 @@ func FindProblemById(id int) *ProblemModel {
 }
 
 func fetchProblemFromDB(id int) *ProblemModel {
-	problem.connection.Initialize()
-	return problem.connection.Fetch("problems", id)
+	connection.Initialize()
+	return connection.Fetch("problems", id)
 }
 
 func parse(id int) *ProblemModel {
