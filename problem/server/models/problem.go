@@ -23,7 +23,7 @@ func (p *ProblemModel) Save() {
 func FindProblemById(id int) *ProblemModel {
 	problem := fetchProblemFromDB(id)
 	if problem == nil {
-		problem := parse(id)
+		problem = parse(id)
 		problem.Save()
 	}
 
