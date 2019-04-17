@@ -9,11 +9,11 @@ import (
 
 type ProblemModel struct {
 	Id int `json:"id"`
-	Title string `json:"title" goquery:"#problem_title" firestore:"title"`
+	Title string `json:"title" goquery:"#problem_title,html" firestore:"title"`
 	Description string `json:"description" goquery:"#problem_description,html" firestore:"description"`
-	InputDescription string `json:"inputDescription" goquery:"#problem_input" firestore:"input_description"`
-	OutputDescription string `json:"outputDescription" goquery:"#problem_output" firestore:"output_description"`
-	Testcases []string `json:"testcases" goquery:".sampledata" firestore:"testcases"`
+	InputDescription string `json:"inputDescription" goquery:"#problem_input,html" firestore:"input_description"`
+	OutputDescription string `json:"outputDescription" goquery:"#problem_output,html" firestore:"output_description"`
+	Testcases []string `json:"testcases" goquery:".sampledata,html" firestore:"testcases"`
 }
 
 func (p *ProblemModel) Save() {
@@ -23,9 +23,10 @@ func (p *ProblemModel) Save() {
 func FindProblemById(id int) *ProblemModel {
 	problem := fetchProblemFromDB(id)
 	if problem == nil {
-		problem = parse(id)
+		problem := parse(id)
 		problem.Save()
 	}
+
 	return problem
 }
 

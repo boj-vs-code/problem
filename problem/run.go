@@ -1,4 +1,4 @@
-package problem
+package main
 
 import "github.com/moreal/boj-vs-code-api-server/problem/server"
 

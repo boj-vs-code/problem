@@ -33,7 +33,7 @@ func (c *Connection) Add(collection string, id int, data interface{}) {
 	}
 }
 
-func (c *Connection) Fetch(collection string, id int) *problem.ProblemModel {
+func (c *Connection) Fetch(collection string, id int) *ProblemModel {
 	doc := c.client.Doc(fmt.Sprintf("%s/%d", collection, id))
 	log.Print(doc)
 	if doc == nil {
